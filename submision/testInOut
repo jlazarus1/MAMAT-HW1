@@ -1,0 +1,33 @@
+#!/bin/bash
+#function name - testInOut
+#Description - checks to see if the output of the program is the same as the desired ouput
+#parameters - first param - name of log file
+#	      second param - names of program (not to compile)
+#	      third param - name of input file for program
+#	      fourth param - name of desired output
+#return value - if the output is the same as the desired one the script returns 0, else it returns 1
+###############################################################################
+
+if (($# != 4)); then
+echo "too many or not enough variables, exiting..."
+exit 1;
+
+else
+
+
+./"$2" >"$1".log <"$3"
+
+if !(diff "$1".log "$4" >/dev/null); then
+
+echo "InOut X"
+exit 1
+
+else
+
+echo "InOut V"
+exit 0
+
+fi 
+
+
+fi

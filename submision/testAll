@@ -1,0 +1,66 @@
+#!/bin/bash
+#Function name - testAll
+#Description - runs tests from a list that is given by a parameters and prints the number of over all test and the number of tests that succeeded
+#Parameters - Param 1 - list of tests in this order - <test description>@<program name>@<inout/file.in>@<inout/file.out>
+#return value - void
+##############################################################################
+if [ $# != 1 ]; then
+
+	echo "too many or not enough variables, exiting..."
+	exit 1;
+
+else
+
+if [ -d "logs" ]; then
+
+	echo "error!, exiting...."
+	exit 1
+else 
+mkdir logs
+#move to temp file all the tests to run with removing the spaces
+grep -v '^\s*$' "$1" | uniq > "$1".tmp
+
+#gets the number of tests to run from the file
+nums=$( cat "$1".tmp | wc -l )
+
+#read the different items from the list that are needed for running the tests and put them each into an array
+readarray -t descript < <(cut -d@ -f1 "$1".tmp)
+readarray -t prog_name < <(cut -d@ -f2 "$1".tmp)
+readarray -t in_file < <(cut -d@ -f3 "$1".tmp)
+readarray -t out_file < <(cut -d@ -f4 "$1".tmp)
+
+#initiate count to 0 so if all fail it will show 0
+
+count=0;
+
+#run on the number of lines and for each line run the appropriate test as instructed in the assignment
+
+for ((i=1; i<=nums; i++));
+do
+
+	echo "$(($i)):"${descript[(($i-1))]}""
+	if ( ./testCompile logs/$i.compile "${prog_name[(($i-1))]}" 1> /dev/null 2> /dev/null );then
+		count=$((count+1))
+
+	fi
+
+	
+	if (./testInOut logs/$i.inout "${prog_name[(($i-1))]}" "${in_file[(($i-1))]}" "${out_file[(($i-1))]}" 1> /dev/null 2> /dev/null); then
+		count=$((count+1))
+	
+	fi
+
+	if (./testMem logs/$i.memory "${prog_name[(($i-1))]}" "${in_file[(($i-1))]}" 1> /dev/null 2> /dev/null); then
+		count=$((count+1))
+	fi
+done
+ 
+echo "number of successful tests was:$count"
+echo "number of total tests was:$(($nums * 3))"
+rm -f "$1".tmp
+exit 1
+
+fi
+fi
+
+

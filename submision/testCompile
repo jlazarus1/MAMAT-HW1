@@ -1,0 +1,26 @@
+#!/bin/bash
+#function name - testCompile
+#description - compiles a C program and returns a value if succeeded or not
+#Paramaters - first param - log file name
+#	      second param - name of program
+#return value - returns 0 if compilation succeeded and 1 if not
+#########################################################################
+if (($# != 2)); then
+echo "too many or not enough variables, exiting..."
+exit 1;
+
+else 
+#here we compile with all the errors and warnings
+gcc -Wall "$2".c -o "$2" 2> "$1".log 
+if [ ! -s "$1.log" ]; then
+
+
+	echo "Compile V"
+	exit 0
+
+else 
+	echo "Compile X"
+	exit 1
+fi
+
+fi

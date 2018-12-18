@@ -1,0 +1,40 @@
+#!/bin/bash
+#function name - testMem
+#Description - the script checks to see if there are any memory leaks or errors when runnning a C program.
+#Parameters - param 1 = log file name
+# 	      param 2 = name of file
+# 	      param 3 = name of input file
+#return value - returns 0 if no errors or leaks were found, else returns 1
+###############################################################################
+
+if (($# != 3)); then
+	echo "too many or not enough variables, exiting..."
+	exit 1;
+
+else
+zero=0;
+valgrind  --tool=memcheck --leak-check=full ./"$2"  2> "$1".log 1> /dev/null <"$3"
+
+allocs=$(grep "total heap usage" "$1".log | cut -d" " -f7) 1> /dev/null
+
+frees=$(grep "total heap usage" "$1".log | cut -d" " -f9) 1> /dev/null
+ 
+errors=$(grep "ERROR SUMMARY" "$1".log | cut -d" " -f4) 1> /dev/null
+
+echo "$frees"
+echo "$allocs"
+if (( "$errors" == "$zero" )) && (( "$allocs" == "$frees" ))   ; then
+
+echo "Memory V"
+
+exit 0
+
+else 
+
+echo "Memory X"
+
+exit 1
+
+
+fi
+fi
